@@ -16,19 +16,14 @@
 
 ;; B must be different from its adjacents
 (assert (and
-		 (xor b2 a2)
 		 (xor b2 c2)))
 
 ;; C must be different from its adjacents
 (assert (and
-		 (xor c2 a2)
-		 (xor c2 b2)
 		 (xor c2 d2)))
 
 ;; D must be different from its adjacents
-(assert (and
-		 (xor d2 a2)
-		 (xor d2 c2)))
+;; This constraint is already encoded in the previous
 
 ;; The graph is not in 2-COLOURING
 (check-sat)
