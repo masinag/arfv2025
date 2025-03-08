@@ -30,11 +30,6 @@
 		 (xor d2 a2)
 		 (xor d2 c2)))
 
-;; Implicitly at least one node should be True
-;; Using this modelling I forced a node to be either True or False without using
-;; additional assertions 
-(assert (or a2 b2 c2 d2))
-
 ;; The graph is not in 2-COLOURING
 (check-sat)
 (get-model)
