@@ -1,49 +1,78 @@
-from pysmt.shortcuts import *
+from pysmt.shortcuts import And, Or, Not, Iff, ExactlyOne, Solver, Symbol, BOOL, TRUE
+
 
 def print_model(model):
     for day in days:
-        company = [cname for c, cname in companies.items() if model[day_company[f"c_{day}_{c}"]] == TRUE()][0]
-        position = [pname for p, pname in positions.items() if model[day_position[f"p_{day}_{p}"]] == TRUE()][0]
+        company = [
+            cname
+            for c, cname in companies.items()
+            if model[day_company[f"c_{day}_{c}"]] == TRUE()
+        ][0]
+        position = [
+            pname
+            for p, pname in positions.items()
+            if model[day_position[f"p_{day}_{p}"]] == TRUE()
+        ][0]
         print(f"Day {day}: interview for {company} as {position}")
 
 
 days = [0, 1, 2, 3]
-positions = {"c": "copywriter", "g": "graphic designer", "s": "sales rep", "m": "social media"}
-companies = {"A": "Alpha Plus", "L": "Laneplex", "S": "Sanbox", "I": "Streeter Inc."}
+positions = {
+    "c": "copywriter",
+    "g": "graphic designer",
+    "s": "sales rep",
+    "m": "social media",
+}
+companies = {
+    "A": "Alpha Plus",
+    "L": "Laneplex",
+    "S": "Sanbox",
+    "I": "Streeter Inc.",
+}
 
-day_position = {f"p_{i}_{j}": Symbol(f"p_{i}_{j}", BOOL) for i in days for j in positions}
-day_company = {f"c_{i}_{j}": Symbol(f"c_{i}_{j}", BOOL) for i in days for j in companies}
+day_position = {
+    f"p_{i}_{j}": Symbol(f"p_{i}_{j}", BOOL) for i in days for j in positions
+}
+day_company = {
+    f"c_{i}_{j}": Symbol(f"c_{i}_{j}", BOOL) for i in days for j in companies
+}
 
 assertions = []
 
 # The Alpha Plus interview is 2 days before the copywriter one
-assertions.append(Or(
-    And(day_company["c_0_A"], day_position["p_2_c"]),
-    And(day_company["c_1_A"], day_position["p_3_c"]),
-))
+assertions.append(
+    Or(
+        And(day_company["c_0_A"], day_position["p_2_c"]),
+        And(day_company["c_1_A"], day_position["p_3_c"]),
+    )
+)
 
 # The graphic design interview is after the Sancode interview
-assertions.append(Or(
-    And(day_company["c_0_S"], day_position["p_1_g"]),
-    And(day_company["c_0_S"], day_position["p_2_g"]),
-    And(day_company["c_0_S"], day_position["p_3_g"]),
-    And(day_company["c_1_S"], day_position["p_2_g"]),
-    And(day_company["c_1_S"], day_position["p_3_g"]),
-    And(day_company["c_2_S"], day_position["p_3_g"]),
-))
+assertions.append(
+    Or(
+        And(day_company[f"c_{day_S}_S"], day_position[f"p_{day_g}_g"])
+        for day_S in days
+        for day_g in days
+        if day_S < day_g
+    )
+)
 
 # Of the interview for the sales rep position and the Laneplex
 # interview, one is on Aug. 23rd and the other is on Aug. 20th
-assertions.append(Or(
-    And(day_company["c_3_L"], day_position["p_0_s"]),
-    And(day_company["c_0_L"], day_position["p_3_s"]),
-))
+assertions.append(
+    Or(
+        And(day_company["c_3_L"], day_position["p_0_s"]),
+        And(day_company["c_0_L"], day_position["p_3_s"]),
+    )
+)
 
 # The Streeter Inc. interview is 2 days after that for Alpha Plus
-assertions.append(Or(
-    And(day_company["c_0_A"], day_company["c_2_I"]),
-    And(day_company["c_1_A"], day_company["c_3_I"]),
-))
+assertions.append(
+    Or(
+        And(day_company["c_0_A"], day_company["c_2_I"]),
+        And(day_company["c_1_A"], day_company["c_3_I"]),
+    )
+)
 
 # No social media interview is on Aug. 23
 assertions.append(Not(day_position["p_3_m"]))
@@ -85,5 +114,3 @@ with Solver("msat") as msat:
             print("Solution is unique!")
     else:
         print("No solution exists")
-
-

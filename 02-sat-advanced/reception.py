@@ -1,23 +1,24 @@
-from pysmt.shortcuts import *
-from pysmt.solvers.msat import MathSAT5Solver
+from pysmt.shortcuts import And, Or, Symbol, BOOL, ExactlyOne, Solver, TRUE
 
 guests = list("ABCDE")
 rooms = list("12345")
 
 xx = {f"x_{g}_{r}": Symbol(f"x_{g}_{r}", BOOL) for g in guests for r in rooms}
 
+
 def print_model(model, i):
     assignment = {}
-    for g in guests[:i+1]:
+    for g in guests[: i + 1]:
         room = [r for r in rooms if model[xx[f"x_{g}_{r}"]] == TRUE()]
         assert len(room) == 1
         room = room[0]
         assignment[g] = room
     print(", ".join(f"{g} -> {r}" for g, r in assignment.items()))
 
+
 def print_core(core):
     print(And(core).serialize())
-        
+
 
 assertions = []
 guests_preferences = []
@@ -47,15 +48,20 @@ guests_preferences.append(Or(xx["x_E_1"], xx["x_E_5"]))
 
 
 with Solver("msat", unsat_cores_mode="named") as msat:
-    msat: MathSAT5Solver
     msat.add_assertions(assertions)
     for i, guest_pref in enumerate(guests_preferences):
         msat.push()
         msat.add_assertion(guest_pref)
         if msat.solve():
-            print(f"Guest number {i+1} can be satisfied", end=" ")
+            print(
+                f"Guest number {i+1} can be satisfied",
+                end=" ",
+            )
             print_model(msat.get_model(), i)
         else:
-            print(f"Guest number {i+1} cannot be satisfied, because of", end=" ")
+            print(
+                f"Guest number {i+1} cannot be satisfied, because of",
+                end=" ",
+            )
             print_core(msat.get_unsat_core())
             break

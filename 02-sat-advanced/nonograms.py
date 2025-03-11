@@ -1,8 +1,14 @@
-from pysmt.shortcuts import *
+from pysmt.shortcuts import And, Or, Not, Solver, Symbol, BOOL, TRUE
+
 N_ROWS = 5
 N_COLS = 5
 
-xx = {f"x_{i}_{j}": Symbol(f"x_{i}{j}", BOOL) for i in range(N_ROWS) for j in range(N_COLS)}
+xx = {
+    f"x_{i}_{j}": Symbol(f"x_{i}{j}", BOOL)
+    for i in range(N_ROWS)
+    for j in range(N_COLS)
+}
+
 
 def encode_row(row, n_consecutive):
     cases = []
@@ -35,18 +41,27 @@ def encode_col(col, n_consecutive):
 def print_solution(model):
     for i in range(N_ROWS):
         for j in range(N_COLS):
-            if model[xx[f"x_{i}_{j}"]]==TRUE():
+            if model[xx[f"x_{i}_{j}"]] == TRUE():
                 print("X", end="")
             else:
                 print(" ", end="")
         print()
+
 
 assertions = []
 
 assertions.append(encode_row(0, 2))
 assertions.append(encode_row(1, 3))
 assertions.append(encode_row(2, 3))
-assertions.append(And(xx[f"x_{3}_{0}"], xx[f"x_{3}_{1}"], xx[f"x_{3}_{2}"], Not(xx[f"x_{3}_{3}"]), xx[f"x_{3}_{4}"]))
+assertions.append(
+    And(
+        xx[f"x_{3}_{0}"],
+        xx[f"x_{3}_{1}"],
+        xx[f"x_{3}_{2}"],
+        Not(xx[f"x_{3}_{3}"]),
+        xx[f"x_{3}_{4}"],
+    )
+)
 assertions.append(encode_row(4, 1))
 
 assertions.append(encode_col(0, 2))
