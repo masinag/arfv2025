@@ -39,4 +39,7 @@
 (push 1)
 (assert (! (or x_D_2 x_D_4) :named guestD))
 (check-sat)
+(push 1)
+(assert (! (or x_E_1 x_E_5) :named guestE))
+(check-sat)
 (get-unsat-core)
