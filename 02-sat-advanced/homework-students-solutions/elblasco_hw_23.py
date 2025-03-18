@@ -41,30 +41,30 @@ def one_queen_per_col(board: dict, assertiosn: list, n: int):
 def one_queen_per_diagonal(board: dict, assertions: list, n: int):
     for row in range(n):
         for col in range(n):
+            diagonal_conflicts = []
+            anti_diagonal_conflicts = []
+
+            for row_diag in range(n):
+                # Check the diagonal (row - col is constant)
+                col_diag = row_diag + (col - row)
+                if 0 <= col_diag < n and (row_diag != row or col_diag != col):
+                    diagonal_conflicts.append(board[f"cb{row_diag}{col_diag}"])
+                # Check the anti-diagonal (row + col is constant)
+                col_anti_diag = (row + col) - row_diag
+                if 0 <= col_anti_diag < n and (row_diag != row or col_diag != col):
+                    anti_diagonal_conflicts.append(
+                        board[f"cb{row_diag}{col_diag}"]
+                    )
+
             assertions.append(
                 Implies(
                     board[f"cb{row}{col}"],
-                    Not(
-                        Or(
-                            board[f"cb{row_diag}{col_diag}"]
-                            for row_diag in range(n)
-                            for col_diag in range(n)
-                            # row_diag and col_diag must skip the current cell
-                            # row - col is constant in the diagonal
-                            # row + col is constant in the anti-diagonal
-                            if
-                            (row_diag != row or col_diag != col)
-                            and
-                            (row_diag - col_diag == row - col
-                             or
-                             row_diag + col_diag == row + col)
-                        )
-                    )
+                    Not(Or(diagonal_conflicts + anti_diagonal_conflicts))
                 )
             )
 
 
-# Just print a model formatted as a chess-board, the queens are positioned on
+# Just printa model formatted as a chess-board, the queens are positioned on
 # the black squares
 def print_chess_board(model: dict, board: dict, n: int):
     for row in range(n):
