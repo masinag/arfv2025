@@ -11,7 +11,7 @@ vars = {
 
 assertions = []
 
-# Each number is conatined exactly once in each row
+# Each number is contained exactly once in each row
 for number in range(1, 10):
     for row in range(1, 10):
         assertions.append(
@@ -21,7 +21,7 @@ for number in range(1, 10):
             )
         )
 
-# Each number is conatined exactly once in each column
+# Each number is contained exactly once in each column
 for number in range(1, 10):
     for col in range(1, 10):
         assertions.append(
@@ -31,7 +31,7 @@ for number in range(1, 10):
             )
         )
 
-# Each number is conatined exactly once in each 3x3 square
+# Each number is contained exactly once in each 3x3 square
 for number in range(1, 10):
     for srow in range(1, 10, 3):
         for scol in range(1, 10, 3):
