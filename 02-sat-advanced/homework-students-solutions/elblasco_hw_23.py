@@ -51,7 +51,7 @@ def one_queen_per_diagonal(board: dict, assertions: list, n: int):
                     diagonal_conflicts.append(board[f"cb{row_diag}{col_diag}"])
                 # Check the anti-diagonal (row + col is constant)
                 col_anti_diag = (row + col) - row_diag
-                if 0 <= col_anti_diag < n and (row_diag != row or col_diag != col):
+                if 0 <= col_anti_diag < n and (row_diag != row or col_anti_diag != col):
                     anti_diagonal_conflicts.append(
                         board[f"cb{row_diag}{col_diag}"]
                     )
