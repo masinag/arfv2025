@@ -2,7 +2,7 @@
 
 # https://logic.puzzlebaron.com/play.php?u2=9db6a5914e4ef572fe50bc57bac9efd5
 
-from pysmt.shortcuts import And, ExactlyOne, Solver, Symbol, BOOL, TRUE
+from pysmt.shortcuts import Or, And, ExactlyOne, Solver, Symbol, BOOL, TRUE
 
 months = ["jan", "feb", "mar", "apr"]
 names = ["guadalupe", "keith", "ollie", "yvette"]
@@ -24,7 +24,7 @@ assertions = []
 
 # 1.Ollie has been studying the Stosam culture.
 assertions.append(
-    ExactlyOne(
+    Or(
         And(nvars[f"{month}ollie"], cvars[f"{month}stosam"])
         for month in months
     )
@@ -34,7 +34,7 @@ assertions.append(
 # Stosam culture.
 
 assertions.append(
-    ExactlyOne(
+    Or(
         And(nvars["febkeith"], cvars["janstosam"]),
         And(nvars["markeith"], cvars["febstosam"]),
         And(nvars["aprkeith"], cvars["marstosam"])
