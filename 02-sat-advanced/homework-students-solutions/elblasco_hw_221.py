@@ -26,26 +26,34 @@ assertions = []
 
 # 1. Walter's purchase didn't cost $105.
 assertions.append(
-    ExactlyOne(
-        wvars[f"{price}walter"]
-        for price in prices
-        if price != "105"
-    )
+    Not(wvars["105walter"])
 )
 
 # 2. The five butterflies were Nick's purchase, the butterfly that sold for $45
 # the peacock butterfly, the butterfly that sold for $90 and the butterfly that
 # sold for $105.
 
+# Nick did not do any purchase of 45$, 90$ or 105$
 assertions.append(
     Not(
-        Or(bvars["45peacock"], bvars["90peacock"], bvars["105peacock"])
+        Or(
+            wvars["45nick"], wvars["90nick"], wvars["105nick"]
+        )
+    )
+)
+
+# The peacock has not been bought for 45$, 90$ or 105$
+assertions.append(
+    Not(
+        Or(
+            bvars["45peacock"], bvars["90peacock"], bvars["105peacock"]
+        )
     )
 )
 
 # 3. The grayling butterfly cost 15 dollars less than the atlas butterfly.
 assertions.append(
-    ExactlyOne(
+    Or(
         And(bvars["45grayling"], bvars["60atlas"]),
         And(bvars["60grayling"], bvars["75atlas"]),
         And(bvars["75grayling"], bvars["90atlas"]),
@@ -56,27 +64,56 @@ assertions.append(
 # 4. Linda's purchase was either the insect that sold for $60 or the grayling
 # butterfly.
 
+# Formula to encode "Linda bought grayling for a price which was not 60$"
+linda_bought_grayling = Or(
+    And(
+        wvars[f"{price}linda"], bvars[f"{price}grayling"]
+    )
+    for price in prices
+    if price != "60"
+)
+
 assertions.append(
-    ExactlyOne(
-        wvars["60linda"],
-        And(wvars["45linda"], bvars["45grayling"]),
-        And(wvars["75linda"], bvars["75grayling"]),
-        And(wvars["90linda"], bvars["90grayling"]),
-        And(wvars["105linda"], bvars["105grayling"])
+    Or(
+        And(wvars["60linda"], Not(linda_bought_grayling)),
+        And(Not(wvars["60linda"]), linda_bought_grayling)
     )
 )
 
 # 5. Of the clearwing butterfly and the peacock butterfly, one sold for $105
 # and the other was won by Alejandro.
-assertions.append(
-    Or(bvars["105clearwing"], bvars["105peacock"])
+
+# Alejandro bought a clearwing for not 105$
+alejandro_bought_clearwing = Or(
+    And(
+        wvars[f"{price}alejandro"], bvars[f"{price}clearwing"]
+    )
+    for price in prices
+    if price != "105"
 )
+
+# Alejandro bought a peacock for not 105$
+alejandro_bought_peacock = Or(
+    And(
+        wvars[f"{price}alejandro"], bvars[f"{price}peacock"]
+    )
+    for price in prices
+    if price != "105"
+)
+
 
 assertions.append(
     Or(
-        And(wvars[f"{price}alejandro"], bvars[f"{price}{butterfly}"])
-        for price in prices
-        for butterfly in {"peacock", "clearwing"}
+        # In this case someone bought peacock for 105$ and alejandro one of the
+        # other butterflies
+        And(
+            bvars["105peacock"], alejandro_bought_clearwing
+        ),
+        # In this case someone bought clearwing for 105$ and alejandro one of
+        # the other butterflies
+        And(
+            bvars["105clearwing"], alejandro_bought_peacock
+        )
     )
 )
 
