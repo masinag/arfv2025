@@ -51,6 +51,18 @@ assertions.append(
     )
 )
 
+# Nick did not buy the peacock butterfly for the remaining prices
+assertions.append(
+    Not(
+        Or(
+            And(
+                wvars[f"{price}nick"], bvars[f"{price}peacock"]
+            )
+            for price in ["60", "75"]
+        )
+    )
+)
+
 # 3. The grayling butterfly cost 15 dollars less than the atlas butterfly.
 assertions.append(
     Or(
@@ -75,7 +87,7 @@ linda_bought_grayling = Or(
 
 assertions.append(
     Or(
-        And(wvars["60linda"], Not(linda_bought_grayling)),
+        And(wvars["60linda"], Not(bvars["60grayling"])),
         And(Not(wvars["60linda"]), linda_bought_grayling)
     )
 )
