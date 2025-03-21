@@ -1,31 +1,34 @@
-# Automated Reasoning and Formal Verification
+# **Automated Reasoning and Formal Verification**  
 
-Material for the labs of the course
-`Automated Reasoning and Formal Verification`
-from the University of Trento (a.a. 2024/2025).
+Lab materials for the course **Automated Reasoning and Formal Verification**
+at the University of Trento (a.a. 2024/2025).  
 
-Video recordings will be uploaded on
-[the course website](https://didatticaonline.unitn.it/dol/course/view.php?id=41102).
+📺 **Video recordings** will be available on the [course website](https://didatticaonline.unitn.it/dol/course/view.php?id=41102).  
 
-## Homework solutions
+---
 
-Students can contribute with homework solutions:
+## 🚀 Contributing Homework Solutions  
 
-- fork the repository
-- create a file in your fork in `./<lab>/homeworks-students-solutions/<username>_hw_<number>.<ext>`.
-- open a pull request (PR)
+Students are encouraged to contribute their homework solutions:  
 
-See [https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project)
+1. **Fork** this repository.  
+2. **Add** your solution in the folder:
+  ```./<lab>/homeworks-students-solutions/<username>hw<number>.<ext>```
+3. **Open a pull request (PR)** to submit your work.  
 
-I will revise the solutions and merge the PR.
+🔗 **Need help?** See [GitHub's guide on contributing to a project](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project).  
 
-## Software
+I will review submissions and merge accepted PRs.  
 
-### MathSAT
+---
 
-Download it from [the MathSAT website](https://mathsat.fbk.eu/download.html).
+## 🛠 Software Setup  
 
-### PySMT
+### **MathSAT**  
+🔗 Download it from the [MathSAT website](https://mathsat.fbk.eu/download.html).  
+
+### **PySMT**  
+Install dependencies and set up PySMT with MathSAT:  
 
 ```bash
 pip install -r requirements.txt
