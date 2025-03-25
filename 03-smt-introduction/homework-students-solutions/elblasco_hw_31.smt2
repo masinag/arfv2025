@@ -31,9 +31,9 @@
 	   )
 
 ;; Hidden all digits must be greater than 0
-(assert (> A 0))
-(assert (> B 0))
-(assert (> C 0))
+(assert (and (>= A 0) (<= A 9)))
+(assert (and (>= B 0) (<= B 9)))
+(assert (and (>= C 0) (<= C 9)))
 
 (check-sat)
 (get-model)

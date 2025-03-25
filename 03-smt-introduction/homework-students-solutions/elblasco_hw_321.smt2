@@ -15,7 +15,7 @@
 (define-fun r () Int (+ rr lr))
 
 ;; The total weight is sum
-(assert (!(= sum (+ r l)):named assert_sum))
+(assert (!(= sum (+ r l)) :named assert_sum))
 
 ;; r and l has the same weight
 (assert (!(= r l) :named r_same_as_l))
