@@ -1,4 +1,17 @@
-from pysmt.shortcuts import And, Equals, Implies, Int, Not, Or, Solver, Symbol
+from pysmt.shortcuts import (
+    LT,
+    And,
+    Equals,
+    Implies,
+    Int,
+    Ite,
+    Not,
+    Or,
+    Plus,
+    Real,
+    Solver,
+    Symbol,
+)
 from pysmt.typing import BOOL, INT, FunctionType
 
 agatha = Int(0)
@@ -52,8 +65,14 @@ for suspect in suspects:
     assertions.append(Implies(hates(agatha, suspect), hates(butler, suspect)))
 
 # No one hates everyone
+# Cardinality constraints with pseudo-Boolean constraints
 for s1 in suspects:
-    assertions.append(Or(Not(hates(s1, s2)) for s2 in suspects))
+    assertions.append(
+        LT(Plus(Ite(hates(s1, s2), Real(1), Real(0)) for s2 in suspects), Real(3))
+    )
+# Equivalent:
+# for s1 in suspects:
+#     assertions.append(Or(Not(hates(s1, s2)) for s2 in suspects))
 
 with Solver("msat") as solver:
     solver.add_assertions(assertions)
