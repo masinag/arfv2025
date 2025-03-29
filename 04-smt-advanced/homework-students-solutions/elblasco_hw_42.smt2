@@ -8,7 +8,11 @@
 (declare-const E Int)
 
 ;; The numbers must be positive
-(assert (and (>= A 0) (>= B 0) (>= C 0) (>= D 0) (>= E 0)))
+(assert (and (>= A 0) (<= A 4)
+			 (>= B 0) (<= B 4)
+			 (>= C 0) (<= C 4)
+			 (>= D 0) (<= D 4)
+			 (>= E 0) (<= E 4)))
 
 ;; Tasks cannot run in parallel
 (assert (distinct A B C D E))
