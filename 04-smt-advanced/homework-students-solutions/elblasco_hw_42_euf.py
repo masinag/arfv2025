@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 from pysmt.shortcuts import (
     And,
     Equals,
@@ -60,27 +61,38 @@ for x in processes_names:
                 )
             )
 
+# Strongly connected: for all x and y (can be the same), "x is scheduled before
+# y" or "y is scheduled before x"
+for x in processes_names:
+    for y in processes_names:
+        assertions.append(
+            Or(
+                scheduled_before(x, y),
+                scheduled_before(y, x)
+            )
+        )
+
 # We can execute A after D is completed
-assertions.append(scheduled_before(D, A))
+assertions.append(Not(scheduled_before(A, D)))
 
 # We can execute B after C and E are completed
 assertions.append(
     And(
-        scheduled_before(C, B),
-        scheduled_before(E, B)
+        Not(scheduled_before(B, C)),
+        Not(scheduled_before(B, E))
     )
 )
 
 # We can execute E after B or D are completed
 assertions.append(
     Or(
-        scheduled_before(B, E),
-        scheduled_before(D, E)
+        Not(scheduled_before(E, B)),
+        Not(scheduled_before(E, D))
     )
 )
 
 # We can execute C after A is completed
-assertions.append(scheduled_before(A, C))
+assertions.append(Not(scheduled_before(C, A)))
 
 # "last" should be one of the tasks
 assertions.append(
@@ -90,11 +102,12 @@ assertions.append(
     )
 )
 
-# If a task is not "last" then it is executed before "last":
+# If a task "last" is "x" then "x is scheduled before last", i.e., x <= last
+# but due to the premise x == last:
 for x in processes_names:
     assertions.append(
         Implies(
-            Not(Equals(x, last)),
+            Equals(x, last),
             scheduled_before(x, last)
         )
     )
