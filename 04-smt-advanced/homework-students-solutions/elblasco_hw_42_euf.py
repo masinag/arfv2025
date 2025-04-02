@@ -106,10 +106,7 @@ assertions.append(
 # but due to the premise x == last:
 for x in processes_names:
     assertions.append(
-        Implies(
-            Equals(x, last),
-            scheduled_before(x, last)
-        )
+        scheduled_before(x, last)
     )
 
 with Solver("msat") as msat:
