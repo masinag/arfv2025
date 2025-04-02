@@ -27,10 +27,14 @@ I will review submissions and merge accepted PRs.
 ### **MathSAT**  
 🔗 Download it from the [MathSAT website](https://mathsat.fbk.eu/download.html).  
 
+### **OptiMathSAT**  
+🔗 Download it from the [OptiMathSAT website](https://optimathsat.disi.unitn.it/pages/download-js.html).  
+
 ### **PySMT**  
 Install dependencies and set up PySMT with MathSAT:  
 
 ```bash
 pip install -r requirements.txt
 pysmt-install --msat
+pysmt-install --z3
 ```
