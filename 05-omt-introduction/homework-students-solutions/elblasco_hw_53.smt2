@@ -25,7 +25,9 @@
 			 (<= E NCOLOURS) (<= F NCOLOURS) (<= G NCOLOURS) (<= H NCOLOURS)
 			 (<= I NCOLOURS) (<= J NCOLOURS)(<= K NCOLOURS)(<= L NCOLOURS)))
 
-;; Give a country all its adjacents must have a different value
+;; Give a country all its adjacents must have a different values
+;; There are some duplicated edges since I applied an algorithminc reduction
+;; from N-COLOURING to OMT
 (assert (not (or (= A B) (= A D))))
 
 (assert (not (or (= B A) (= B C) (= B E))))
