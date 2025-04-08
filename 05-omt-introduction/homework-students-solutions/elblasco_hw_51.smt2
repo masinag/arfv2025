@@ -1,6 +1,6 @@
 (set-option :produce-models true)
 
-;; Very vertex is an integer that have value either 1 or 0; 1 if the vterx is in
+;; Every vertex is an integer that have value either 1 or 0; 1 if the vertex is in
 ;; the vertex cover subset, 0 otherwise.
 (declare-const A Int)
 (declare-const B Int)
