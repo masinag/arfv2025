@@ -1,0 +1,35 @@
+MODULE app-bop(num1, num2, bop)
+DEFINE
+  result := case
+	bop = sum : num1 + num2;
+	bop = sub : num1 - num2;
+	bop = mul : num1 * num2;
+  esac;
+
+MODULE main
+VAR
+    index : 0..2;
+    arr1 : array 0..2 of 1..10;
+    arr2 : array 0..2 of 1..10;
+    bop : array 0..2 of {sum, sub, mul};
+	res: array 0..2 of -10..100;
+	tmp: app-bop(arr1[index], arr2[index], bop[index]);
+ASSIGN
+    init(index) := 0;
+    next(index) := index < 2 ? index + 1 : index;
+
+    next(arr1[0]) := arr1[0];
+    next(arr1[1]) := arr1[1];
+    next(arr1[2]) := arr1[2];
+    
+    next(arr2[0]) := arr2[0];
+    next(arr2[1]) := arr2[1];
+    next(arr2[2]) := arr2[2];
+
+    next(bop[0]) := bop[0]; 
+    next(bop[1]) := bop[1];
+    next(bop[2]) := bop[2];
+	
+    next(res[0]) := index = 0 ? tmp.result : res[0];
+    next(res[1]) := index = 1 ? tmp.result : res[1];
+    next(res[2]) := index = 2 ? tmp.result : res[2];
