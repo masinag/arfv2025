@@ -1,0 +1,67 @@
+-- Solution done in the lab with comments.
+
+MODULE main
+VAR
+  c   : 0..6;
+  o   : 0..6;
+  o2  : 0..6;
+  co  : 0..6;
+  co2 : 0..6;
+  reaction : {r1, r2, r3, r4, none};
+
+ASSIGN
+  init(o2) := 0;
+  init(co) := 0;
+  init(co2) := 0;
+
+TRANS
+  (o < 2) -> reaction!=r1;
+TRANS
+  (c < 1 | o  < 1) -> reaction!=r2;
+TRANS
+  (c < 2 | o2 < 1) -> reaction!=r3;
+TRANS
+  (c < 1 | o2 < 1) -> reaction!=r4;
+ASSIGN
+  next(o) := case
+    reaction=r1 & o >= 2 : o - 2;
+    reaction=r2 & o >= 1 : o - 1;
+    TRUE                 : o;
+  esac;
+  next(c) := case
+    reaction=r2 & c >= 1 : c - 1;
+    reaction=r3 & c >= 2 : c - 2;
+    reaction=r4 & c >= 1 : c - 1;
+    TRUE                 : c;
+  esac;
+  next(o2) := case
+    reaction=r1 & o2 <  6 : o2 + 1;
+    reaction=r3 & o2 >= 1 : o2 - 1;
+    reaction=r4 & o2 >= 1 : o2 - 1;
+    TRUE                  : o2;
+  esac;
+  next(co) := case
+    reaction=r2 & co <  6 : co + 1;
+    reaction=r3 & co <  5 : co + 2;
+    TRUE                  : co;
+  esac;
+  next(co2) := case
+    reaction=r4 & co2 < 6 : co2 + 1;
+    TRUE                  : co2;
+  esac;
+
+CTLSPEC (c=6 & o=6) -> EF co2=3; -- FALSE
+-- This is because there exists an initial state with reaction=r2 from which we
+-- cannot reach any state with co2=3. In fact, if reaction=r2 we "waste" some 
+-- atoms to generate a CO molecule, and from there it's impossible to generate 
+-- 3 CO2 molecules.
+
+CTLSPEC (c=6 & o=6 & reaction=r1) -> EF co2=3; -- TRUE
+-- If we force the first reaction to be r1, then we only have one initial state
+-- from which there exists a path with a state with co2=3.
+
+LTLSPEC G co2!=3;
+-- To get the actual path, we negate the property and find a counter-example.
+
+
+
