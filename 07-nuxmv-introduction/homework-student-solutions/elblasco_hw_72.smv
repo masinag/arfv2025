@@ -12,8 +12,8 @@ VAR
     arr1 : array 0..2 of 1..10;
     arr2 : array 0..2 of 1..10;
     bop : array 0..2 of {sum, sub, mul};
-	res : array 0..2 of -10..100;
-	tmp : app-bop(arr1[index], arr2[index], bop[index]);
+    res : array 0..2 of -10..100;
+    tmp : app-bop(arr1[index], arr2[index], bop[index]);
 ASSIGN
     init(index) := 0;
     next(index) := min(index + 1, 2);
