@@ -3,7 +3,7 @@ DEFINE
   n := 5;
   sorted := arr[0] <= arr[1] & arr[1] <= arr[2] & arr[2] <= arr[3] & arr[3] <= arr[4];
 VAR
-  arr: array 0..4 of {4, 1, 3, 2, 5};
+  arr: array 0..4 of 1..5;
   swapped: boolean;
   i: 1..n;
   pc: {l3, l4, l5, l6, l7, end};
