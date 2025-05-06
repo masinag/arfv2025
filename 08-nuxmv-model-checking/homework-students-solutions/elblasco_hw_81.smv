@@ -7,6 +7,13 @@ VAR
   swapped: boolean;
   i: 1..n;
   pc: {l3, l4, l5, l6, l7, end};
+  -- l3  -> while swapped:
+  -- l4  ->     swapped = false
+  -- l5  ->     for i in range(1, n):
+  -- l6  ->         if A[i-1] > A[i]:
+  -- l7  ->             A[i-1], A[i] = A[i], A[i-1]
+  -- l7  ->             swapped = true
+  -- end -> # The algorithm finished
 ASSIGN
   init(arr[0]) := 4;
   init(arr[1]) := 1;
@@ -51,13 +58,13 @@ ASSIGN
   esac;
 
   next(pc) := case
-	pc = l3 & swapped: l4; 
-	pc = l3 & !swapped: end;
+	pc = l3 & swapped: l4;                      -- While true branch
+	pc = l3 & !swapped: end;                    -- While false branch
 	pc = l4 : l5;
-	pc = l5 & i < n: l6;
-	pc = l5 & i >= n: l3;
-	pc = l6 & arr[i - 1] > arr[i] & i < n: l7;
-	pc = l6 & arr[i - 1] <= arr[i] & i < n: l5;
+	pc = l5 & i < n: l6;                        -- For true branch
+	pc = l5 & i >= n: l3;                       -- For false branch
+	pc = l6 & arr[i - 1] > arr[i] & i < n: l7;  -- If true branch
+	pc = l6 & arr[i - 1] <= arr[i] & i < n: l5; -- If false branch
 	pc = l7 & i < n: l5;
 	TRUE: end;
   esac;
