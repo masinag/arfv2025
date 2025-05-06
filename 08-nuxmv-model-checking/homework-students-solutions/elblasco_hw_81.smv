@@ -1,0 +1,88 @@
+MODULE main
+DEFINE
+  n := 5;
+  sorted := arr[0] <= arr[1] & arr[1] <= arr[2] & arr[2] <= arr[3] & arr[3] <= arr[4];
+VAR
+  arr: array 0..4 of 1..5;
+  swapped: boolean;
+  i: 1..n;
+  pc: {l3, l4, l5, l6, l7, end};
+  -- l3  -> while swapped:
+  -- l4  ->     swapped = false
+  -- l5  ->     for i in range(1, n):
+  -- l6  ->         if A[i-1] > A[i]:
+  -- l7  ->             A[i-1], A[i] = A[i], A[i-1]
+  -- l7  ->             swapped = true
+  -- end -> # The algorithm finished
+ASSIGN
+  init(arr[0]) := 4;
+  init(arr[1]) := 1;
+  init(arr[2]) := 3;
+  init(arr[3]) := 2;
+  init(arr[4]) := 5;
+  init(swapped) := TRUE;
+  init(pc) := l3;
+
+  next(swapped) := case
+	pc = l4: FALSE;
+	pc = l7: TRUE;
+	TRUE: swapped;
+  esac;
+
+  next(arr[0]) := case
+	pc = l7 & i = 1 & arr[0] > arr[1]: arr[1];
+	TRUE: arr[0];
+  esac;
+
+  next(arr[1]) := case
+	pc = l7 & i = 1 & arr[0] > arr[1]: arr[0];
+	pc = l7 & i = 2 & arr[1] > arr[2]: arr[2];
+	TRUE: arr[1];
+  esac;
+
+  next(arr[2]) := case
+	pc = l7 & i = 2 & arr[1] > arr[2]: arr[1];
+	pc = l7 & i = 3 & arr[2] > arr[3]: arr[3];
+	TRUE: arr[2];
+  esac;
+
+  next(arr[3]) := case
+	pc = l7 & i = 3 & arr[2] > arr[3]: arr[2];
+	pc = l7 & i = 4 & arr[3] > arr[4]: arr[4];
+	TRUE: arr[3];
+  esac;
+
+  next(arr[4]) := case
+	pc = l7 & i = 4 & arr[3] > arr[4]: arr[3];
+	TRUE: arr[4];
+  esac;
+
+  next(pc) := case
+	pc = l3 & swapped: l4;                      -- While true branch
+	pc = l3 & !swapped: end;                    -- While false branch
+	pc = l4 : l5;
+	pc = l5 & i < n: l6;                        -- For true branch
+	pc = l5 & i >= n: l3;                       -- For false branch
+	pc = l6 & arr[i - 1] > arr[i] & i < n: l7;  -- If true branch
+	pc = l6 & arr[i - 1] <= arr[i] & i < n: l5; -- If false branch
+	pc = l7 & i < n: l5;
+	TRUE: end;
+  esac;
+
+  next(i) := case
+     pc = l4: 1;
+     next(pc) = l5 & i < n: i + 1;
+     TRUE: i;
+   esac;
+
+-- There exists no path in which the algorithm ends (false)
+LTLSPEC G !(pc = end);
+
+-- There exists no path in which the algorithm ends with a sorted array (false)
+LTLSPEC G (pc = end -> !sorted);
+
+-- For all path the algorithm ends (true)
+LTLSPEC F (pc = end);
+
+-- All paths in which the algorithm ends have a sorted array (true)
+LTLSPEC G (pc = end -> sorted);
