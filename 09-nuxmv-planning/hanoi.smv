@@ -1,0 +1,40 @@
+-- Tower of Hanoi problem with three poles (left, middle, right)
+-- and four ordered disks d1, d2, d3, d4,
+-- disk d1 is the smallest one
+
+MODULE main
+VAR
+  d1   : {left, middle, right}; -- smallest
+  d2   : {left, middle, right};
+  d3   : {left, middle, right};
+  d4   : {left, middle, right}; -- largest
+  move : 1..4;
+DEFINE
+  clear1 := TRUE;
+  clear2 := d1 != d2;
+  clear3 := d1 != d3 & d2 != d3;
+  clear4 := d1 != d4 & d2 != d4 & d3 != d4;
+INIT
+  d1 = left & d2 = left & d3 = left & d4 = left;
+TRANS -- moves description
+  (move = 1 -> next(d1) != d1 & next(d2)  = d2 & next(d3)  = d3 & next(d4)  = d4) &
+  (move = 2 -> next(d1)  = d1 & next(d2) != d2 & next(d3)  = d3 & next(d4)  = d4  &
+               next(d2) != d1)                                                    &
+  (move = 3 -> next(d1)  = d1 & next(d2)  = d2 & next(d3) != d3 & next(d4)  = d4  &
+               next(d3) != d1 & next(d3) != d2)                                   &
+  (move = 4 -> next(d1)  = d1 & next(d2)  = d2 & next(d3)  = d3 & next(d4) != d4  &
+               next(d4) != d1 & next(d4) != d2 & next(d4) != d3);
+INVAR -- a non-clear disk cannot be moved
+  (!clear1 -> move != 1) &
+  (!clear2 -> move != 2) &
+  (!clear3 -> move != 3) &
+  (!clear4 -> move != 4);
+INVAR -- if all three columns are occupied, don't move the largest disk
+  ((clear1 & clear2 & clear3) -> move != 3) &
+  ((clear1 & clear2 & clear4) -> move != 4) &
+  ((clear1 & clear3 & clear4) -> move != 4) &
+  ((clear2 & clear3 & clear4) -> move != 4);
+LTLSPEC -- get a plan for reaching a goal state
+  ! F (d1 = right & d2 = right & d3 = right & d4 = right);
+INVARSPEC -- equivalent but with invarspec
+  ! (d1 = right & d2 = right & d3 = right & d4 = right);
