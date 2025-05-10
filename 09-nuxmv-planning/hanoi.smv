@@ -16,20 +16,22 @@ DEFINE
   clear4 := d1 != d4 & d2 != d4 & d3 != d4;
 INIT
   d1 = left & d2 = left & d3 = left & d4 = left;
-TRANS -- moves description
-  (move = 1 -> next(d1) != d1 & next(d2)  = d2 & next(d3)  = d3 & next(d4)  = d4) &
-  (move = 2 -> next(d1)  = d1 & next(d2) != d2 & next(d3)  = d3 & next(d4)  = d4  &
-               next(d2) != d1)                                                    &
-  (move = 3 -> next(d1)  = d1 & next(d2)  = d2 & next(d3) != d3 & next(d4)  = d4  &
-               next(d3) != d1 & next(d3) != d2)                                   &
-  (move = 4 -> next(d1)  = d1 & next(d2)  = d2 & next(d3)  = d3 & next(d4) != d4  &
-               next(d4) != d1 & next(d4) != d2 & next(d4) != d3);
 INVAR -- a non-clear disk cannot be moved
   (!clear1 -> move != 1) &
   (!clear2 -> move != 2) &
   (!clear3 -> move != 3) &
   (!clear4 -> move != 4);
+TRANS -- one disk is moved per turn
+  (move = 1 <-> next(d1) != d1) &
+  (move = 2 <-> next(d2) != d2) &
+  (move = 3 <-> next(d3) != d3) &
+  (move = 4 <-> next(d4) != d4);
+TRANS -- a disk cannot be moved on top of a smaller one
+  (move = 2 -> next(d2) != d1)                                    &
+  (move = 3 -> next(d3) != d1 & next(d3) != d2)                   &
+  (move = 4 -> next(d4) != d1 & next(d4) != d2 & next(d4) != d3);
 INVAR -- if all three columns are occupied, don't move the largest disk
+      -- otherwise we would have a deadlock
   ((clear1 & clear2 & clear3) -> move != 3) &
   ((clear1 & clear2 & clear4) -> move != 4) &
   ((clear1 & clear3 & clear4) -> move != 4) &

@@ -28,6 +28,13 @@ VAR
   block_b : block(b, a, c);
   block_c : block(c, b, none);
   move    : {move_a, move_b, move_c};
+INVAR -- symmetry of above/below relation
+  (block_a.above = b <-> block_b.below = a) &
+  (block_a.above = c <-> block_c.below = a) &
+  (block_b.above = a <-> block_a.below = b) &
+  (block_b.above = c <-> block_c.below = b) &
+  (block_c.above = a <-> block_a.below = c) &
+  (block_c.above = b <-> block_b.below = c);
 INVAR -- only clear blocks can be moved
   (!block_a.clear -> move != move_a) &
   (!block_b.clear -> move != move_b) &
@@ -47,13 +54,6 @@ TRANS -- a block remains connected to any non-moving block
   (move != move_b & block_c.above = b -> next(block_c.above) = b) &
   (move != move_c & block_a.above = c -> next(block_a.above) = c) &
   (move != move_c & block_b.above = c -> next(block_b.above) = c);
-INVAR -- symmetry of above/below relation
-  (block_a.above = b <-> block_b.below = a) &
-  (block_a.above = c <-> block_c.below = a) &
-  (block_b.above = a <-> block_a.below = b) &
-  (block_b.above = c <-> block_c.below = b) &
-  (block_c.above = a <-> block_a.below = c) &
-  (block_c.above = b <-> block_b.below = c);
 LTLSPEC -- get a plan for reaching a goal state
   ! F (block_a.below = none & block_b.below = a & block_c.below = b);
 LTLSPEC -- get a plan for reaching a configuration where all the blocks are on the table
