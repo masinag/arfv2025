@@ -38,3 +38,4 @@ INVAR
 
 LTLSPEC
 ! (safe_state U goal);
+-- There exists an inifinite plan
