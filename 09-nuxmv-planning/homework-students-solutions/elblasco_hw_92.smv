@@ -1,0 +1,40 @@
+MODULE main
+
+VAR
+  fox: {right,left};
+  chicken: {right,left};
+  caterpillar: {right,left};
+  lettuce: {right,left};
+  man: {right, left};
+  -- fch := fox and chicken
+  -- fca := fox and caterpillar
+  -- fl := fox and lettuce ....
+  move: {fch, fca, fl, chca, chl, cal, empty};
+
+DEFINE
+  goal := fox = left & chicken = left & caterpillar = left & lettuce = left & man = left;
+  safe_state := ((chicken in {caterpillar, fox}) -> chicken = man) &
+                ((caterpillar in {lettuce, chicken}) -> caterpillar = man);
+
+INIT
+  fox = right & chicken = right & caterpillar = right & lettuce = right & man = right;
+
+TRANS
+  next(man) != man &
+  (move = fch <-> (next(fox) != fox &  next(chicken) != chicken)) &
+  (move = fca <-> (next(fox) != fox & next(caterpillar) != caterpillar)) &
+  (move = fl <-> (next(fox) != fox & next(lettuce) != lettuce)) &
+  (move = chca <-> (next(chicken) != chicken & next(caterpillar) != caterpillar)) &
+  (move = chl <-> (next(chicken) != chicken & next(lettuce) != lettuce)) &
+  (move = cal <-> (next(caterpillar) != caterpillar & next(lettuce) != lettuce));
+
+INVAR
+  ((man != fox & man != chicken) -> move != fch) &
+  ((man != fox & man != caterpillar) -> move != fca) &
+  ((man != fox & man != lettuce) -> move != fl) &
+  ((man != chicken & man != caterpillar) -> move != chca) &
+  ((man != chicken & man != lettuce) -> move != chl) &
+  ((man != caterpillar & man != lettuce) -> move != cal);
+
+LTLSPEC
+! (safe_state U goal);
