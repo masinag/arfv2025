@@ -9,7 +9,7 @@ VAR
   -- fch := fox and chicken
   -- fca := fox and caterpillar
   -- fl := fox and lettuce ....
-  move: {fch, fca, fl, chca, chl, cal, empty};
+  move: {fch, fca, fl, chca, chl, cal, none};
 
 DEFINE
   goal := fox = left & chicken = left & caterpillar = left & lettuce = left & man = left;
@@ -26,15 +26,16 @@ TRANS
   (move = fl <-> (next(fox) != fox & next(lettuce) != lettuce)) &
   (move = chca <-> (next(chicken) != chicken & next(caterpillar) != caterpillar)) &
   (move = chl <-> (next(chicken) != chicken & next(lettuce) != lettuce)) &
-  (move = cal <-> (next(caterpillar) != caterpillar & next(lettuce) != lettuce));
+  (move = cal <-> (next(caterpillar) != caterpillar & next(lettuce) != lettuce)) &
+  (move = none <-> (next(fox) = fox &  next(chicken) = chicken & next(caterpillar) = caterpillar & next(lettuce) = lettuce));
 
 INVAR
-  ((man != fox & man != chicken) -> move != fch) &
-  ((man != fox & man != caterpillar) -> move != fca) &
-  ((man != fox & man != lettuce) -> move != fl) &
-  ((man != chicken & man != caterpillar) -> move != chca) &
-  ((man != chicken & man != lettuce) -> move != chl) &
-  ((man != caterpillar & man != lettuce) -> move != cal);
+  ((man != fox | man != chicken) -> move != fch) &
+  ((man != fox | man != caterpillar) -> move != fca) &
+  ((man != fox | man != lettuce) -> move != fl) &
+  ((man != chicken | man != caterpillar) -> move != chca) &
+  ((man != chicken | man != lettuce) -> move != chl) &
+  ((man != caterpillar | man != lettuce) -> move != cal);
 
 LTLSPEC
 ! (safe_state U goal);
