@@ -1,0 +1,42 @@
+MODULE main
+
+VAR
+  fox: {right,left};
+  chicken: {right,left};
+  caterpillar: {right,left};
+  lettuce: {right,left};
+  man: {right, left};
+  passenger1: {f, ch, ca, l, none};
+  passenger2: {f, ch, ca, l, none};
+
+DEFINE
+  goal := fox = left & chicken = left & caterpillar = left & lettuce = left & man = left;
+  safe_state := ((chicken in {caterpillar, fox}) -> chicken = man) &
+                ((caterpillar in {lettuce, chicken}) -> caterpillar = man);
+  -- The following define is just to show off the possibility to transport only
+  -- one passenger
+  -- safe_state := ((chicken in {caterpillar, fox}) -> chicken = man) &
+  --               ((caterpillar in {lettuce, chicken, fox}) -> caterpillar = man);
+
+INIT
+  fox = right & chicken = right & caterpillar = right & lettuce = right & man = right;
+
+TRANS
+  next(man) != man &
+  ((passenger1 = f | passenger2 = f) <-> next(fox) != fox) &
+  ((passenger1 = ch | passenger2 = ch) <-> next(chicken) != chicken) &
+  ((passenger1 = ca | passenger2 = ca) <-> next(caterpillar) != caterpillar) &
+  ((passenger1 = l | passenger2 = l) <-> next(lettuce) != lettuce);
+
+INVAR
+  (passenger1 != none | passenger2 != none) -> passenger1 != passenger2;
+
+INVAR
+  (man != fox -> (passenger1 != f & passenger2 != f)) &
+  (man != chicken -> (passenger1 != ch & passenger2 != ch)) &
+  (man != caterpillar -> (passenger1 != ca & passenger2 != ca)) &
+  (man != lettuce -> (passenger1 != l & passenger2 != l));
+
+LTLSPEC
+! (safe_state U goal);
+-- There exists an inifinite plan

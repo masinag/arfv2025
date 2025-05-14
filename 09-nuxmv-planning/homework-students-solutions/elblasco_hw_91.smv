@@ -1,0 +1,51 @@
+MODULE main
+
+VAR
+  d1: {left,middle,right};
+  d2: {left,middle,right};
+  d3: {left,middle,right};
+  d4: {left,middle,right};
+  d5: {left,middle,right};
+  move : 1..5;
+
+INIT
+  d1 = left & d2 = left & d3 = left & d4 = left & d5 = left;
+
+DEFINE
+  clear1 := TRUE;
+  clear2 := d1 != d2;
+  clear3 := d1 != d3 & d2 != d3;
+  clear4 := d1 != d4 & d2 != d4 & d3 != d4;
+  clear5 := d1 != d5 & d2 != d5 & d3 != d5 & d4 != d5;
+
+-- A non-clear disk cannot be moved
+INVAR
+  (!clear1 -> move != 1) &
+  (!clear2 -> move != 2) &
+  (!clear3 -> move != 3) &
+  (!clear4 -> move != 4) &
+  (!clear5 -> move != 5);
+
+-- If at least one smaller disk is clear then we cannot move the bigger disk
+-- clear1 is omitted since it is always TRUE
+INVAR
+  (clear2 | clear3 | clear4) -> (move != 5);
+INVAR
+  (clear2 | clear3) -> (move != 4);
+INVAR
+  clear2 -> (move != 3);
+
+TRANS
+  ((move = 1 -> (next(d1) != d1 & next(d2) = d2 & next(d3) = d3 & next(d4) = d4 & next(d5) = d5)) &
+
+  (move = 2 -> (next(d1) = d1 & next(d2) != d2 & next(d3) = d3 & next(d4) = d4 & next(d5) = d5 & next(d2) != d1)) &
+
+  (move = 3 -> (next(d1) = d1 & next(d2) = d2 & next(d3) != d3 & next(d4) = d4 & next(d5) = d5 & next(d3) != d1 & next(d3) != d2)) &
+
+  (move = 4 -> (next(d1) = d1 & next(d2) = d2 & next(d3) = d3 & next(d4) != d4 & next(d5) = d5 & next(d4) != d1 & next(d4) != d2 & next(d4) != d3)) &
+
+  (move = 5 -> (next(d1) = d1 & next(d2) = d2 & next(d3) = d3 & next(d4) = d4 & next(d5) != d5 & next(d5) != d1 & next(d5) != d2 & next(d5) != d3 & next(d5) != d4)));
+
+INVARSPEC
+  !(d1 = right & d2 = right & d3 = right & d4 = right & d5 = right);
+-- There exists a plan
