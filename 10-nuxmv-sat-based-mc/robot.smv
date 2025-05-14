@@ -1,0 +1,39 @@
+MODULE main
+VAR 
+  x : 0..9;
+  y : 0..9;
+  state : {MOVE, CHECK, CHARGE, CLEAN, OFF};
+  budget : 0..100;
+DEFINE 
+  pos := y*10 + x;
+INIT 
+  state = CHECK & x = 0 & y = 0 & budget = 0;
+ASSIGN 
+  next(budget) := case
+    state in {MOVE, CLEAN} & budget > 0 : budget - 1;
+    state = CHARGE : 100;
+    TRUE : budget;
+  esac;
+
+  next(state) :=  case 
+    pos = 0 & budget < 100  : CHARGE;
+    budget = 0              : OFF;
+    state in {CHARGE, MOVE} : CHECK;
+    state = CHECK           : {CLEAN, MOVE};
+    TRUE                    : MOVE;
+  esac;
+
+TRANS 
+  (state != MOVE -> (next(x) = x     & next(y) = y)) &
+  (state  = MOVE -> (next(x) = x + 1 & next(y) = y) |
+                    (next(x) = x - 1 & next(y) = y) |
+                    (next(x) = x     & next(y) = y + 1) |
+                    (next(x) = x     & next(y) = y - 1));
+LTLSPEC -- In all possible executions, the robot changes position infinitely many times
+  G F pos != next(pos);
+LTLSPEC -- It is never the case that the robot's action is either MOVE or CLEAN and the available budget is zero
+  G !(state in {MOVE, CLEAN} & budget = 0);
+LTLSPEC -- If the robot charges infinitely often, then it changes position infinitely often
+  (G F state = CHARGE) -> (G F pos != next(pos));
+INVARSPEC -- The robot does not move along the diagonals
+  next(x) = x | next(y) = y;
