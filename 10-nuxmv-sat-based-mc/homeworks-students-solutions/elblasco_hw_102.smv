@@ -1,0 +1,74 @@
+MODULE gnomeSort(arr, len)
+VAR
+  pos: 0..len;
+  pc: {l0, l1, l2, l3, l4, l5};
+DEFINE
+  sorted := arr[0] <= arr[1] & arr[1] <= arr[2] & arr[2] <= arr[3] & arr[3] <= arr[4];
+INIT
+  pos = 0 & pc = l0;
+ASSIGN
+  next(arr[0]) := case
+	pc = l4 & pos = 1 & arr[0] > arr[1]: arr[1];
+	TRUE: arr[0];
+  esac;
+
+  next(arr[1]) := case
+	pc = l4 & pos = 1 & arr[0] > arr[1]: arr[0];
+	pc = l4 & pos = 2 & arr[1] > arr[2]: arr[2];
+	TRUE: arr[1];
+  esac;
+
+  next(arr[2]) := case
+	pc = l4 & pos = 2 & arr[1] > arr[2]: arr[1];
+	pc = l4 & pos = 3 & arr[2] > arr[3]: arr[3];
+	TRUE: arr[2];
+  esac;
+
+  next(arr[3]) := case
+	pc = l4 & pos = 3 & arr[2] > arr[3]: arr[2];
+	pc = l4 & pos = 4 & arr[3] > arr[4]: arr[4];
+	TRUE: arr[3];
+  esac;
+
+  next(arr[4]) := case
+	pc = l4 & pos = 4 & arr[3] > arr[4]: arr[3];
+	TRUE: arr[4];
+  esac;
+
+  next(pc) := case
+	pc = l0: l1;
+	pc = l1 & pos < len: l2;
+	pc = l1 & pos >= len: l5;
+	pc = l2 & (pos = 0 | (arr[pos] >= arr[pos - 1] & pos < len)): l3;
+	pc = l2 & !(pos = 0 | (arr[pos] >= arr[pos - 1] & pos < len)): l4;
+	pc = l3: l1;
+	pc = l4: l1;
+	pc = l5: l5;
+	TRUE: l5;
+  esac;
+
+  next(pos) := case
+     pc = l0: 0;
+     pc = l3 & pos < len: pos + 1;
+	 pc = l4 & pos > 0: pos - 1;
+     TRUE: pos;
+   esac;
+
+LTLSPEC
+-- This is true, therefore for every execution the algorithm eventually terminates
+F pc = l5;
+
+LTLSPEC
+-- This is true, therefore for every execution the array is eventually sorted
+F sorted;
+
+LTLSPEC
+-- This is true, therefore for every execution the algorithm terminates only after the array is sorted 
+(pc != l5 U sorted)
+
+MODULE main
+VAR
+  arr: array 0..4 of {9, 7, 5, 3, 1};
+  result: gnomeSort(arr, 5);
+INIT
+  arr[0] = 9 & arr[1] = 7 & arr[2] = 5 & arr[3] = 3 & arr[4] = 1;
