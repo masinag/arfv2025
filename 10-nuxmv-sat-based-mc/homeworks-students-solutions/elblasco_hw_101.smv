@@ -1,14 +1,19 @@
 MODULE main
 VAR
+  -- number of missionaries and cannibals on both sides
   cr: 0..3;
   cl: 0..3;
   mr: 0..3;
   ml: 0..3;
   boat: {l, r};
+  -- cm: one cannibal and one missionary
+  -- c: one cannibal
+  -- ....
   move: {cm, c, m, mm, cc};
 
 DEFINE
   goal := cr = 0 & mr = 0 & cl = 3 & ml = 3;
+  -- The safe state needs to be check only if there is at least one missionary 
   safe := (mr > 0 -> cr <= mr) & (ml > 0 -> cl <= ml);
 
 INIT
@@ -16,6 +21,7 @@ INIT
 
 TRANS
   next(boat) != boat &
+  -- Moves one cannibal and one missionary from the right bank to the left one
   ((move = cm & boat = r) <-> (next(cr) = cr - 1 & next(mr) = mr - 1 & next(cl) = cl + 1 & next(ml) = ml + 1)) &
   ((move = cm & boat = l) <-> (next(cl) = cl - 1 & next(ml) = ml - 1 & next(cr) = cr + 1 & next(mr) = mr + 1)) &
   ((move = c & boat = r) <-> (next(cr) = cr - 1 & next(cl) = cl + 1 & next(ml) = ml & next(mr) = mr)) &
