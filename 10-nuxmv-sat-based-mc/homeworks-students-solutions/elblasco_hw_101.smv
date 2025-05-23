@@ -15,26 +15,33 @@ DEFINE
   goal := cr = 0 & mr = 0 & cl = 3 & ml = 3;
   -- The safe state needs to be check only if there is at least one missionary 
   safe := (mr > 0 -> cr <= mr) & (ml > 0 -> cl <= ml);
-
+  -- If a missionary is removed from right (or a cannibal arrives to right), the number on the right should be safe
+  safe_mr := next(mr) > 0 -> next(mr) >= next(cr);
+  -- If a missionary is removed from left (or a cannibal arrives to left), the number on the left should be safe
+  safe_ml := next(ml) > 0 -> next(ml) >= next(cl);
+  
 INIT
  cr = 3 & mr = 3 & cl = 0 & ml = 0 & boat = r;
 
 TRANS
   next(boat) != boat &
   -- Moves one cannibal and one missionary from the right bank to the left one
-  ((move = cm & boat = r) <-> (next(cr) = cr - 1 & next(mr) = mr - 1 & next(cl) = cl + 1 & next(ml) = ml + 1)) &
-  ((move = cm & boat = l) <-> (next(cl) = cl - 1 & next(ml) = ml - 1 & next(cr) = cr + 1 & next(mr) = mr + 1)) &
-  ((move = c & boat = r) <-> (next(cr) = cr - 1 & next(cl) = cl + 1 & next(ml) = ml & next(mr) = mr)) &
-  ((move = c & boat = l) <-> (next(cl) = cl - 1 & next(cr) = cr + 1 & next(ml) = ml & next(mr) = mr)) &
-  ((move = m & boat = r) <-> (next(mr) = mr - 1 & next(ml) = ml + 1 & next(cl) = cl & next(cr) = cr)) &
-  ((move = m & boat = l) <-> (next(ml) = ml - 1 & next(mr) = mr + 1 & next(cl) = cl & next(cr) = cr)) &
-  ((move = mm & boat = r) <-> (next(mr) = mr - 2 & next(ml) = ml + 2 & next(cl) = cl & next(cr) = cr)) &
-  ((move = mm & boat = l) <-> (next(ml) = ml - 2 & next(mr) = mr + 2 & next(cl) = cl & next(cr) = cr)) &
-  ((move = cc & boat = r) <-> (next(cr) = cr - 2 & next(cl) = cl + 2 & next(ml) = ml & next(mr) = mr)) &
-  ((move = cc & boat = l) <-> (next(cl) = cl - 2 & next(cr) = cr + 2 & next(ml) = ml & next(mr) = mr));
+  ((move = cm & boat = r) <-> (next(cr) = cr - 1 & next(mr) = mr - 1 & next(cl) = cl + 1 & next(ml) = ml + 1 & safe_mr & safe_ml)) &
+  ((move = cm & boat = l) <-> (next(cl) = cl - 1 & next(ml) = ml - 1 & next(cr) = cr + 1 & next(mr) = mr + 1 & safe_mr & safe_ml)) &
+  ((move = c & boat = r) <-> (next(cr) = cr - 1 & next(cl) = cl + 1 & next(ml) = ml & next(mr) = mr & safe_mr & safe_ml)) &
+  ((move = c & boat = l) <-> (next(cl) = cl - 1 & next(cr) = cr + 1 & next(ml) = ml & next(mr) = mr & safe_mr & safe_ml)) &
+  ((move = m & boat = r) <-> (next(mr) = mr - 1 & next(ml) = ml + 1 & next(cl) = cl & next(cr) = cr & safe_mr & safe_ml)) &
+  ((move = m & boat = l) <-> (next(ml) = ml - 1 & next(mr) = mr + 1 & next(cl) = cl & next(cr) = cr & safe_mr & safe_ml)) &
+  ((move = mm & boat = r) <-> (next(mr) = mr - 2 & next(ml) = ml + 2 & next(cl) = cl & next(cr) = cr & safe_mr & safe_ml)) &
+  ((move = mm & boat = l) <-> (next(ml) = ml - 2 & next(mr) = mr + 2 & next(cl) = cl & next(cr) = cr & safe_mr & safe_ml)) &
+  ((move = cc & boat = r) <-> (next(cr) = cr - 2 & next(cl) = cl + 2 & next(ml) = ml & next(mr) = mr & safe_mr & safe_ml)) &
+  ((move = cc & boat = l) <-> (next(cl) = cl - 2 & next(cr) = cr + 2 & next(ml) = ml & next(mr) = mr & safe_mr & safe_ml));
 
 INVAR
   cr + cl = 3 & mr + ml = 3 & safe;
+
+INVAR
+  ((cr = 0 & mr = 0) -> boat != r) & ((cl = 0 & ml = 0) -> boat != l);
 
 LTLSPEC
   !(safe U goal);
