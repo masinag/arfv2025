@@ -1,0 +1,64 @@
+MODULE main
+VAR
+  rocks: array 0..6 of {brown, green, empty};
+  begin_jump: 0..6;
+  end_jump: 0..6;
+DEFINE
+  goal := rocks[0] = green & rocks[1] = green & rocks[2] = green & rocks[3] = empty & rocks[4] = brown & rocks[5] = brown & rocks[6] = brown;
+INIT
+  rocks[0] = brown &
+  rocks[1] = brown &
+  rocks[2] = brown &
+  rocks[4] = green &
+  rocks[5] = green &
+  rocks[6] = green &
+  rocks[3] = empty;
+
+INVAR
+  (begin_jump - end_jump) in {2, 1, -1, 2};
+
+ASSIGN
+  next(rocks[0]) := case
+	begin_jump = 0: empty;
+	end_jump = 0: rocks[begin_jump];
+	TRUE: rocks[0];
+  esac;
+
+  next(rocks[1]) := case
+	begin_jump = 1: empty;
+	end_jump = 1: rocks[begin_jump];
+	TRUE: rocks[1];
+  esac;
+
+  next(rocks[2]) := case
+	begin_jump = 2: empty;
+	end_jump = 2: rocks[begin_jump];
+	TRUE: rocks[2];
+  esac;
+
+  next(rocks[3]) := case
+	begin_jump = 3: empty;
+	end_jump = 3: rocks[begin_jump];
+	TRUE: rocks[3];
+  esac;
+
+  next(rocks[4]) := case
+	begin_jump = 4: empty;
+	end_jump = 4: rocks[begin_jump];
+	TRUE: rocks[4];
+  esac;
+
+  next(rocks[5]) := case
+	begin_jump = 5: empty;
+	end_jump = 5: rocks[begin_jump];
+	TRUE: rocks[5];
+  esac;
+
+  next(rocks[6]) := case
+	begin_jump = 6: empty;
+	end_jump = 6: rocks[begin_jump];
+	TRUE: rocks[6];
+  esac;
+
+LTLSPEC
+!(F goal);
