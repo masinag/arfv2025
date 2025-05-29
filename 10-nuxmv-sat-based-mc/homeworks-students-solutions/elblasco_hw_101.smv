@@ -13,35 +13,58 @@ VAR
 
 DEFINE
   goal := cr = 0 & mr = 0 & cl = 3 & ml = 3;
-  -- The safe state needs to be check only if there is at least one missionary 
+   -- The safe state needs to be check only if there is at least one missionary 
   safe := (mr > 0 -> cr <= mr) & (ml > 0 -> cl <= ml);
-  -- If a missionary is removed from right (or a cannibal arrives to right), the number on the right should be safe
-  safe_mr := next(mr) > 0 -> next(mr) >= next(cr);
-  -- If a missionary is removed from left (or a cannibal arrives to left), the number on the left should be safe
-  safe_ml := next(ml) > 0 -> next(ml) >= next(cl);
-  
+  -- It is impossible to move one or more missionaries if the number of cannibals and missionaries is equal to 3
+  same_m_c := ((cr = 3 & mr = 3) | (cl = 3 & ml = 3)) -> !(move in {m, mm});
+  -- It is impossible to move two cannibals if we do not have at least two of them or if there is not enough missionary on the other side
+  safe_move_ccl_to_ccr := (boat = l & (cl < 2 | (cr + 2 > mr & mr > 0))) -> move != cc;
+  safe_move_ccr_to_ccl := (boat = r & (cr < 2 | (cl + 2 > ml & ml > 0))) -> move != cc;
+  -- It is impossible to move a cannibal if we do not have at least one of them or if there is not enough missionary on the other side
+  safe_move_cl_to_cr := (boat = l & (cl < 1 | (cr + 1 > mr & mr > 0))) -> move != c;
+  safe_move_cr_to_cl := (boat = r & (cr < 1 | (cl + 1 > ml & ml > 0))) -> move != c;
+  -- It is impossible to move two missionaries if we do not have at least two of them or if the current missionaries - 2 is not greater or equal to current cannibals or if we do not have enough missionaries on the other side
+  safe_move_mml_to_mmr := (boat = l & (ml < 2 | (ml - 2 < cl & ml - 2 > 0) | mr + 2 < cr)) -> move != mm;
+  safe_move_mmr_to_mml := (boat = r & (mr < 2 | (mr - 2 < cr & mr - 2 > 0) | ml + 2 < cl)) -> move != mm;
+  -- It is impossible to move a missionary if we do not have at least one of them or if the current missionaries - 1 is not greater or equal to current cannibals or if we do not have enough missionaries on the other side
+  safe_move_ml_to_mr := (boat = l & (ml < 1 | (ml - 1 < cl & ml - 1 > 0) | mr + 1 < cr)) -> move != m;
+  safe_move_mr_to_ml := (boat = r & (mr < 1 | (mr - 1 < cr & mr - 1 > 0) | ml + 1 < cl)) -> move != m;
+  -- It is impossible to move a missionary and a cammibal if we do not have at least one of each or if we create an unsafe state in one of the two sides
+  safe_move_cml_to_cmr := (boat = l & (ml < 1 | cl < 1 | mr + 1 < cr + 1 | ml - 1 < cl - 1)) -> move != cm;
+  safe_move_cmr_to_cml := (boat = r & (mr < 1 | cr < 1 | ml + 1 < cr + 1 | mr - 1 < cr - 1)) -> move != cm;
+
 INIT
  cr = 3 & mr = 3 & cl = 0 & ml = 0 & boat = r;
 
 TRANS
   next(boat) != boat &
   -- Moves one cannibal and one missionary from the right bank to the left one
-  ((move = cm & boat = r) <-> (next(cr) = cr - 1 & next(mr) = mr - 1 & next(cl) = cl + 1 & next(ml) = ml + 1 & safe_mr & safe_ml)) &
-  ((move = cm & boat = l) <-> (next(cl) = cl - 1 & next(ml) = ml - 1 & next(cr) = cr + 1 & next(mr) = mr + 1 & safe_mr & safe_ml)) &
-  ((move = c & boat = r) <-> (next(cr) = cr - 1 & next(cl) = cl + 1 & next(ml) = ml & next(mr) = mr & safe_mr & safe_ml)) &
-  ((move = c & boat = l) <-> (next(cl) = cl - 1 & next(cr) = cr + 1 & next(ml) = ml & next(mr) = mr & safe_mr & safe_ml)) &
-  ((move = m & boat = r) <-> (next(mr) = mr - 1 & next(ml) = ml + 1 & next(cl) = cl & next(cr) = cr & safe_mr & safe_ml)) &
-  ((move = m & boat = l) <-> (next(ml) = ml - 1 & next(mr) = mr + 1 & next(cl) = cl & next(cr) = cr & safe_mr & safe_ml)) &
-  ((move = mm & boat = r) <-> (next(mr) = mr - 2 & next(ml) = ml + 2 & next(cl) = cl & next(cr) = cr & safe_mr & safe_ml)) &
-  ((move = mm & boat = l) <-> (next(ml) = ml - 2 & next(mr) = mr + 2 & next(cl) = cl & next(cr) = cr & safe_mr & safe_ml)) &
-  ((move = cc & boat = r) <-> (next(cr) = cr - 2 & next(cl) = cl + 2 & next(ml) = ml & next(mr) = mr & safe_mr & safe_ml)) &
-  ((move = cc & boat = l) <-> (next(cl) = cl - 2 & next(cr) = cr + 2 & next(ml) = ml & next(mr) = mr & safe_mr & safe_ml));
+  ((move = cm & boat = r) <-> (next(cr) = cr - 1 & next(mr) = mr - 1 & next(cl) = cl + 1 & next(ml) = ml + 1)) &
+  ((move = cm & boat = l) <-> (next(cl) = cl - 1 & next(ml) = ml - 1 & next(cr) = cr + 1 & next(mr) = mr + 1)) &
+  ((move = c & boat = r) <-> (next(cr) = cr - 1 & next(cl) = cl + 1 & next(ml) = ml & next(mr) = mr)) &
+  ((move = c & boat = l) <-> (next(cl) = cl - 1 & next(cr) = cr + 1 & next(ml) = ml & next(mr) = mr)) &
+  ((move = m & boat = r) <-> (next(mr) = mr - 1 & next(ml) = ml + 1 & next(cl) = cl & next(cr) = cr)) &
+  ((move = m & boat = l) <-> (next(ml) = ml - 1 & next(mr) = mr + 1 & next(cl) = cl & next(cr) = cr)) &
+  ((move = mm & boat = r) <-> (next(mr) = mr - 2 & next(ml) = ml + 2 & next(cl) = cl & next(cr) = cr)) &
+  ((move = mm & boat = l) <-> (next(ml) = ml - 2 & next(mr) = mr + 2 & next(cl) = cl & next(cr) = cr)) &
+  ((move = cc & boat = r) <-> (next(cr) = cr - 2 & next(cl) = cl + 2 & next(ml) = ml & next(mr) = mr)) &
+  ((move = cc & boat = l) <-> (next(cl) = cl - 2 & next(cr) = cr + 2 & next(ml) = ml & next(mr) = mr));
 
 INVAR
-  cr + cl = 3 & mr + ml = 3 & safe;
-
-INVAR
-  ((cr = 0 & mr = 0) -> boat != r) & ((cl = 0 & ml = 0) -> boat != l);
+  cr + cl = 3 &
+  mr + ml = 3 &
+  safe &
+  --same_m_c &
+  safe_move_ccl_to_ccr &
+  safe_move_ccr_to_ccl &
+  safe_move_cl_to_cr &
+  safe_move_cr_to_cl &
+  safe_move_mml_to_mmr &
+  safe_move_mmr_to_mml &
+  safe_move_ml_to_mr &
+  safe_move_mr_to_ml &
+  safe_move_cml_to_cmr &
+  safe_move_cmr_to_cml;
 
 LTLSPEC
   !(safe U goal);
