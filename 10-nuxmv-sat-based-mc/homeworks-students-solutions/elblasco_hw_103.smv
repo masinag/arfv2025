@@ -1,10 +1,13 @@
 MODULE main
 VAR
   rocks: array 0..6 of {brown, green, empty};
-  begin_jump: 0..6;
-  end_jump: 0..6;
+  step: -2..2;
+  move: -1..6;
+
 DEFINE
   goal := rocks[0] = green & rocks[1] = green & rocks[2] = green & rocks[3] = empty & rocks[4] = brown & rocks[5] = brown & rocks[6] = brown;
+  safe_index := move + step <= 6 & move + step >= 0;
+
 INIT
   rocks[0] = brown &
   rocks[1] = brown &
@@ -13,52 +16,66 @@ INIT
   rocks[5] = green &
   rocks[6] = green &
   rocks[3] = empty;
-
+  
 INVAR
-  (begin_jump - end_jump) in {2, 1, -1, 2};
+  (rocks[0] = empty -> move != 0) & (rocks[1] = empty -> move != 1) & (rocks[2] = empty -> move != 2) & (rocks[3] = empty -> move != 3) & (rocks[4] = empty -> move != 4) & (rocks[5] = empty -> move != 5) & (rocks[6] = empty -> move != 6);
 
 ASSIGN
+  -- Using this encoding if a frog is triyng to make the wrong move nothing moves.
+
   next(rocks[0]) := case
-	begin_jump = 0: empty;
-	end_jump = 0: rocks[begin_jump];
+	move = 0 & step in {1, 2} & rocks[move + step] = empty: empty;
+	move != 0 & rocks[move] = green & move + step = 0 & rocks[0] = empty & step < 0 & move >= 0: green;
 	TRUE: rocks[0];
   esac;
 
   next(rocks[1]) := case
-	begin_jump = 1: empty;
-	end_jump = 1: rocks[begin_jump];
+	move = 1 & step in {-1, 1, 2} & rocks[move + step] = empty: empty;
+	move != 1 & rocks[move] = green & move + step = 1 & rocks[1] = empty & step < 0 & move >= 0: green;
+	move != 1 & rocks[move] = brown & move + step = 1 & rocks[1] = empty & step > 0 & move >= 0: brown;
 	TRUE: rocks[1];
   esac;
 
   next(rocks[2]) := case
-	begin_jump = 2: empty;
-	end_jump = 2: rocks[begin_jump];
+	move = 2 & step in {-2, -1, 1, 2} & rocks[move + step] = empty: empty;
+	move != 2 & rocks[move] = green & move + step = 2 & rocks[2] = empty & step < 0 & move >= 0: green;
+	move != 2 & rocks[move] = brown & move + step = 2 & rocks[2] = empty & step > 0 & move >= 0: brown;
 	TRUE: rocks[2];
   esac;
 
   next(rocks[3]) := case
-	begin_jump = 3: empty;
-	end_jump = 3: rocks[begin_jump];
+	move = 3 & step in {-2, -1, 1, 2} & rocks[move + step] = empty: empty;
+	move != 3 & rocks[move] = green & move + step = 3 & rocks[3] = empty & step < 0 & move >= 0: green;
+	move != 3 & rocks[move] = brown & move + step = 3 & rocks[3] = empty & step > 0 & move >= 0: brown;
 	TRUE: rocks[3];
   esac;
 
   next(rocks[4]) := case
-	begin_jump = 4: empty;
-	end_jump = 4: rocks[begin_jump];
+	move = 4 & step in {-2, -1, 1, 2} & rocks[move + step] = empty: empty;
+	move != 4 & rocks[move] = green & move + step = 4 & rocks[4] = empty & step < 0 & move >= 0: green;
+	move != 4 & rocks[move] = brown & move + step = 4 & rocks[4] = empty & step > 0 & move >= 0: brown;
 	TRUE: rocks[4];
   esac;
 
   next(rocks[5]) := case
-	begin_jump = 5: empty;
-	end_jump = 5: rocks[begin_jump];
+	move = 5 & step in {-2, -1, 1} & rocks[move + step] = empty: empty;
+	move != 5 & rocks[move] = green & move + step = 5 & rocks[5] = empty & step < 0 & move >= 0: green;
+	move != 5 & rocks[move] = brown & move + step = 5 & rocks[5] = empty & step > 0 & move >= 0: brown;
 	TRUE: rocks[5];
   esac;
 
   next(rocks[6]) := case
-	begin_jump = 6: empty;
-	end_jump = 6: rocks[begin_jump];
+	move = 6 & step in {-2, -1} & rocks[move + step] = empty: empty;
+	move != 6 & rocks[move] = green & move + step = 6 & rocks[6] = empty & step < 0 & move >= 0: green;
+	move != 6 & rocks[move] = brown & move + step = 6 & rocks[6] = empty & step > 0 & move >= 0: brown;
 	TRUE: rocks[6];
   esac;
 
 LTLSPEC
-!(F goal);
+  !(F goal);
+  
+LTLSPEC -- If a green frog is trying to go backward then nothing should move 
+  G((move >= 0 & step > 0 & rocks[move] = green) -> X(rocks) = rocks); -- Not sure if the X operator is correct
+
+LTLSPEC -- If a brown frog is trying to go backward then nothing should move 
+  G((move >= 0 & step < 0 & rocks[move] = brown) -> X(rocks) = rocks);
