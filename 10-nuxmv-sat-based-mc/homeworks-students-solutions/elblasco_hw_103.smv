@@ -10,7 +10,7 @@ DEFINE
   -- a possible move is considered safe only if the current index plus the proposed jump lays between the array boundaries
   safe_index := move + step <= 6 & move + step >= 0;
 
-  -- A frog can make a jump of 2 onfly if it jumps over another frog
+  -- If a frog can make a jump of step 2 then it must passes over another frog
   valid_2_steps := ((step = 2 & safe_index) -> (move < 6 & rocks[move + 1] != empty)) &
                    ((step = -2 & safe_index) -> (move < 6 & rocks[move - 1] != empty));
 
@@ -35,7 +35,7 @@ INVAR -- The frogs can only move forward
 ASSIGN
   -- Using this encoding if a frog is triyng to make the wrong move nothing moves.
 
-  -- In this case if the frog is brown and it is trying to go backward it is blocked by the invariant on line 27
+  -- In this case if the frog is brown and it is trying to go backward it is blocked by the invariants
   next(rocks[0]) := case
 	move = 0 & step in {1, 2} & rocks[move + step] = empty & valid_2_steps: empty;
 	move != 0 & rocks[move] = green & move + step = 0 & rocks[0] = empty: green;
