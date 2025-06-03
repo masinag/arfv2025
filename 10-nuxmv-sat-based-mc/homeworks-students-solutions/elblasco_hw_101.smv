@@ -15,8 +15,6 @@ DEFINE
   goal := cr = 0 & mr = 0 & cl = 3 & ml = 3;
    -- The safe state needs to be check only if there is at least one missionary 
   safe := (mr > 0 -> cr <= mr) & (ml > 0 -> cl <= ml);
-  -- It is impossible to move one or more missionaries if the number of cannibals and missionaries is equal to 3
-  same_m_c := ((cr = 3 & mr = 3) | (cl = 3 & ml = 3)) -> !(move in {m, mm});
   -- It is impossible to move two cannibals if we do not have at least two of them or if there is not enough missionary on the other side
   safe_move_ccl_to_ccr := (boat = l & (cl < 2 | (cr + 2 > mr & mr > 0))) -> move != cc;
   safe_move_ccr_to_ccl := (boat = r & (cr < 2 | (cl + 2 > ml & ml > 0))) -> move != cc;
@@ -54,7 +52,6 @@ INVAR
   cr + cl = 3 &
   mr + ml = 3 &
   safe &
-  --same_m_c &
   safe_move_ccl_to_ccr &
   safe_move_ccr_to_ccl &
   safe_move_cl_to_cr &
