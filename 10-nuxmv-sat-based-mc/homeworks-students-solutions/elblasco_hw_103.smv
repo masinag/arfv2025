@@ -32,53 +32,59 @@ INVAR -- An empty rock cannot move
 INVAR -- The frogs can only move forward
   (rocks[move] = green -> step <= 0) & (rocks[move] = brown -> step >= 0);
 
+INVAR -- The arrival rock must be empty iff the step is 0
+  (step = 0) <-> (rocks[move+step] != empty);
+
+INVAR -- THe two steps move is possible only there ia frog in the middle;
+  valid_2_steps;
+
 ASSIGN
   -- Using this encoding if a frog is triyng to make the wrong move nothing moves.
 
   -- In this case if the frog is brown and it is trying to go backward it is blocked by the invariants
   next(rocks[0]) := case
-	move = 0 & step in {1, 2} & rocks[move + step] = empty & valid_2_steps: empty;
+	move = 0 & step in {1, 2} & rocks[move + step] = empty : empty;
 	move != 0 & rocks[move] = green & move + step = 0 & rocks[0] = empty: green;
 	TRUE: rocks[0];
   esac;
 
   next(rocks[1]) := case
-	move = 1 & step in {-1, 1, 2} & rocks[move + step] = empty & valid_2_steps: empty;
+	move = 1 & step in {-1, 1, 2} & rocks[move + step] = empty : empty;
 	move != 1 & rocks[move] = green & move + step = 1 & rocks[1] = empty: green;
 	move != 1 & rocks[move] = brown & move + step = 1 & rocks[1] = empty: brown;
 	TRUE: rocks[1];
   esac;
 
   next(rocks[2]) := case
-	move = 2 & step in {-2, -1, 1, 2} & rocks[move + step] = empty & valid_2_steps: empty;
+	move = 2 & step in {-2, -1, 1, 2} & rocks[move + step] = empty : empty;
 	move != 2 & rocks[move] = green & move + step = 2 & rocks[2] = empty: green;
 	move != 2 & rocks[move] = brown & move + step = 2 & rocks[2] = empty: brown;
 	TRUE: rocks[2];
   esac;
 
   next(rocks[3]) := case
-	move = 3 & step in {-2, -1, 1, 2} & rocks[move + step] = empty & valid_2_steps: empty;
+	move = 3 & step in {-2, -1, 1, 2} & rocks[move + step] = empty : empty;
 	move != 3 & rocks[move] = green & move + step = 3 & rocks[3] = empty: green;
 	move != 3 & rocks[move] = brown & move + step = 3 & rocks[3] = empty: brown;
 	TRUE: rocks[3];
   esac;
 
   next(rocks[4]) := case
-	move = 4 & step in {-2, -1, 1, 2} & rocks[move + step] = empty & valid_2_steps: empty;
+	move = 4 & step in {-2, -1, 1, 2} & rocks[move + step] = empty : empty;
 	move != 4 & rocks[move] = green & move + step = 4 & rocks[4] = empty: green;
 	move != 4 & rocks[move] = brown & move + step = 4 & rocks[4] = empty: brown;
 	TRUE: rocks[4];
   esac;
 
   next(rocks[5]) := case
-	move = 5 & step in {-2, -1, 1} & rocks[move + step] = empty & valid_2_steps: empty;
+	move = 5 & step in {-2, -1, 1} & rocks[move + step] = empty : empty;
 	move != 5 & rocks[move] = green & move + step = 5 & rocks[5] = empty: green;
 	move != 5 & rocks[move] = brown & move + step = 5 & rocks[5] = empty: brown;
 	TRUE: rocks[5];
   esac;
 
   next(rocks[6]) := case
-	move = 6 & step in {-2, -1} & rocks[move + step] = empty & valid_2_steps: empty;
+	move = 6 & step in {-2, -1} & rocks[move + step] = empty : empty;
 	move != 6 & rocks[move] = green & move + step = 6 & rocks[6] = empty: green;
 	move != 6 & rocks[move] = brown & move + step = 6 & rocks[6] = empty: brown;
 	TRUE: rocks[6];
@@ -86,8 +92,3 @@ ASSIGN
 
 LTLSPEC
   !(F goal);
-
-INVARSPEC -- If a brown/green frog is trying to go backward then nothing should move 
-  (move >= 0 & ((step < 0 & rocks[move] = brown) |
-                (step > 0 & rocks[move] = green)))
-  -> next(rocks) = rocks;
