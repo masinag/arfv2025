@@ -32,14 +32,13 @@ INVAR -- An empty rock cannot move
 INVAR -- The frogs can only move forward
   (rocks[move] = green -> step <= 0) & (rocks[move] = brown -> step >= 0);
 
-INVAR -- The arrival rock must be empty iff the step is 0
+INVAR -- The arrival rock must be empty iff the step is not 0
   (step = 0) <-> (rocks[move+step] != empty);
 
-INVAR -- THe two steps move is possible only there ia frog in the middle;
+INVAR -- The two steps move is possible only there ia frog in the middle;
   valid_2_steps;
 
 ASSIGN
-  -- Using this encoding if a frog is triyng to make the wrong move nothing moves.
 
   -- In this case if the frog is brown and it is trying to go backward it is blocked by the invariants
   next(rocks[0]) := case
