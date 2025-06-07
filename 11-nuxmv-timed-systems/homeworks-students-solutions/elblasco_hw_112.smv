@@ -1,0 +1,22 @@
+@TIME_DOMAIN continuous
+
+MODULE main
+VAR
+  x: clock;
+  state: {off, light, bright};
+  press: boolean noncontinuous;
+INIT
+  x = 0 & state = off;
+
+TRANS
+  (state = off) -> (next(state) = light & press & next(x) = 0);
+TRANS
+  (state = light) -> ((next(state) = bright & press & x <= 3 & next(x) = x) |
+                      (next(state) = off & press & x > 3 & next(x) = x));
+TRANS
+  (state = bright) -> (next(state) = off & press & next(x) = x);
+
+LTLSPEC
+  (G(F (press & X press))) -> (G (F(state = light)));
+LTLSPEC
+  (G(F[0,2] (press & X press))) -> (G (F(state = bright)));
