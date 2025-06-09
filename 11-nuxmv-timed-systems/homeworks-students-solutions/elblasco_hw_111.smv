@@ -18,8 +18,8 @@ TRANS
   (state = l2) -> (next(state) = l1 & next(x) = 0);
 
 LTLSPEC
-  (state = l2) -> (F[0,1] state = l1);
+  G((state = l2) -> (F[0,1] state = l1));
 LTLSPEC
-  (state = l1) -> (F[0,2] state = l2);
+  G((state = l1) -> (F[0,2] state = l2));
 LTLSPEC
-  G((state = l1 & x = 0) -> (F[0,1] state = l1));
+  F(state = l1 & time = 1);
