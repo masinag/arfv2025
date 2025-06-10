@@ -4,23 +4,29 @@ MODULE main
 VAR
   x: clock;
   state: {off, light, bright};
-  press: boolean noncontinuous; -- The switch may be pressed during a time transition within the same state
+  press: boolean;
 
 INIT
-  x = 0 & state = off & !press; -- The swicth starts tuned off an non-pressed
+  x = 0 & state = off;
   
 URGENT -- As soon as the button is pressed all the timed transitions are stopd
-  press;
+  press;  
 
 TRANS
-  (state = off) -> (next(state) = light & next(x) = 0);
+  (state = off & !press) -> (next(state) = off & next(x) = x & !press & next(press) != press);
 TRANS
-  (state = light) -> (((next(state) = bright & x <= 3) |
-                      (next(state) = off & x > 3)) & next(x) = x);
+  (state = off & press) -> (next(state) = light & next(x) = 0 & press & next(press) != press);
 TRANS
-  (state = bright) -> (next(state) = off & next(x) = x);
+  (state = light & !press) -> (next(state) = light & next(x) = x & !press & next(press) != press);
+TRANS
+  (state = light & press) -> (((next(state) = bright & x <= 3) |
+                               (next(state) = off & x > 3)) & press & next(press) != press);
+TRANS
+  (state = bright & !press) -> (next(state) = bright & next(x) = x & !press & next(press) != press);
+TRANS
+  (state = bright & press) -> (next(state) = off & next(x) = x & press & next(press) != press);
 
 LTLSPEC
-  (G(F (press))) -> (G (F(state = light)));
+  !G((G(F (next(state) != state))) -> (G (F(state = light))));
 LTLSPEC
-  (G(F[0,2] (press))) -> (G (F(state = bright)));
+  !G((G(F[0,2] press)) -> (G (F(state = bright))));
