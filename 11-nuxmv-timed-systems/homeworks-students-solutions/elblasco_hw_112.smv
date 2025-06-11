@@ -1,0 +1,32 @@
+@TIME_DOMAIN continuous
+
+MODULE main
+VAR
+  x: clock;
+  state: {off, light, bright};
+  press: boolean;
+
+INIT
+  x = 0 & state = off;
+  
+URGENT -- As soon as the button is pressed all the timed transitions are stopd
+  press;
+
+TRANS
+  (state = off & !press) -> (next(state) = off & next(x) = x & next(press) != press);
+TRANS
+  (state = off & press) -> (next(state) = light & next(x) = 0 & next(press) != press);
+TRANS
+  (state = light & !press) -> (next(state) = light & next(x) = x & next(press) != press);
+TRANS
+  (state = light & press) -> (((next(state) = bright & x <= 3) |
+                               (next(state) = off & x > 3)) & next(press) != press & next(x) = x);
+TRANS
+  (state = bright & !press) -> (next(state) = bright & next(x) = x & next(press) != press);
+TRANS
+  (state = bright & press) -> (next(state) = off & next(x) = x & next(press) != press);
+
+LTLSPEC
+  (G(F press)) -> (G (F(state = light)));
+LTLSPEC
+  (G(F[0,2] press)) -> (G (F(state = bright)));
